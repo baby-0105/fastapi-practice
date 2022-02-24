@@ -1,20 +1,16 @@
-from typing import List, Optional
+from typing import Optional
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Path, Query
 
 app = FastAPI()
 
 
-@app.get("/items/")
+@app.get("/items/{item_id}")
 async def read_items(
-    q: Optional[str] = Query(
-        None,
-        title="Query string",
-        description="Query string for the items to search in the database that have a good match",
-        min_length=3,
-    )
+    *, item_id: int = Path(..., title="The ID of the item to get", ge=1), q: str
 ):
-    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    results = {"item_id": item_id}
     if q:
         results.update({"q": q})
     return results
+
