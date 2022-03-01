@@ -1,16 +1,23 @@
 from typing import Optional
 
-from fastapi import FastAPI, Path, Query
+from fastapi import Body, FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 
 
-@app.get("/items/{item_id}")
-async def read_items(
-    *, item_id: int = Path(..., title="The ID of the item to get", ge=1), q: str
-):
-    results = {"item_id": item_id}
-    if q:
-        results.update({"q": q})
-    return results
+class Item(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
 
+
+
+@app.put("items/{item_id}")
+async def update_item(
+    item_id: int,
+    item: Item = Body(..., embed=True)
+):
+    results = {"item_id": item_id, "item": item}
+    return results
