@@ -1,25 +1,23 @@
-from typing import Optional
-
-from fastapi import Body, FastAPI
-from pydantic import BaseModel, Field
+from datetime import date
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 
+def main(user_id: str):
+    return user_id
 
-class Item(BaseModel):
+class User(BaseModel):
+    id: int
     name: str
-    description: Optional[str] = Field(
-        None, title="The description of the item", max_length=300
-    )
-    price: float = Field(..., gt=0, description="The price must be greater than zero")
-    tax: Optional[float] = None
+    joined: date
 
+my_user: User = User(id=3, name="John Doe", joined="2018-07-19")
 
+second_user_data = {
+    "id": 4,
+    "name": "Mary",
+    "joined": "2018-11-30",
+}
 
-@app.put("items/{item_id}")
-async def update_item(
-    item_id: int,
-    item: Item = Body(..., embed=True)
-):
-    results = {"item_id": item_id, "item": item}
-    return results
+my_second_user: User = User(**second_user_data)
