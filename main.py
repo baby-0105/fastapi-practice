@@ -1,23 +1,20 @@
-from datetime import date
-from fastapi import FastAPI
+from typing import Optional
+
+from fastapi import FastAPI, Path , Query
 from pydantic import BaseModel
+
 
 app = FastAPI()
 
-def main(user_id: str):
-    return user_id
 
-class User(BaseModel):
-    id: int
-    name: str
-    joined: date
-
-my_user: User = User(id=3, name="John Doe", joined="2018-07-19")
-
-second_user_data = {
-    "id": 4,
-    "name": "Mary",
-    "joined": "2018-11-30",
-}
-
-my_second_user: User = User(**second_user_data)
+@app.get("/items/{item_id}")
+async def read_items(
+    *,
+    item_id: int = Path(..., title="The ID of the item to get", ge=1, le=100),
+    q:  str,
+    size: float = Query(..., gt=0, lt=10.5)
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    return results
