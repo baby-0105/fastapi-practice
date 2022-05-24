@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 
 from pydantic import BaseModel
 
@@ -31,7 +31,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    items: List[Item] = []
+    items: list[Item] = []
 
     class Config:
         orm_mode = True
