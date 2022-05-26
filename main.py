@@ -1,14 +1,26 @@
-import time
+from typing import Union
 
-from fastapi import FastAPI, Request
+from fastapi import BackgroundTasks, Depends, FastAPI
 
 app = FastAPI()
 
 
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    start_time = time.time()
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    return response
+def write_log(message: str):
+    with open("log.txt", mode="a") as log:
+        log.write(message)
+
+
+def get_query(background_tasks: BackgroundTasks, q: Union[str, None] = None):
+    if q:
+        message = f"found query: {q}\n"
+        background_tasks.add_task(write_log, message)
+    return q
+
+
+@app.post("/send-notification/{email}")
+async def send_notification(
+    email: str, background_tasks: BackgroundTasks, q: str = Depends(get_query)
+):
+    message = f"message to {email}\n"
+    background_tasks.add_task(write_log, message)
+    return {"message": "Message sent"}
